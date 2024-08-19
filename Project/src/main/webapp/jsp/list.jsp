@@ -5,13 +5,6 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-    <script type="text/javascript">
-        function handleButtonClick(productId) {
-            // Your JavaScript code here
-            alert("product ID: " + productId + " added to cart");
-            // Add your function logic here
-        }
-    </script>
 </head>
 <body>
 
@@ -40,8 +33,9 @@
                     <td>${product.brandDescription}</td>
                     <td>${product.price}</td>
                     <td>
-                        <button type="button" onclick="handleButtonClick('${product.id}')">Add</button>
+                        <input type='submit' value='Add to Cart'/>
                     </td>
+                    
                 </tr>
             </c:forEach>
         </tbody>
