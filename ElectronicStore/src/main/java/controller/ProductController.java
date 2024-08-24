@@ -11,6 +11,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import dao.ProductDAO;
 import dao.ProductDAOImpl;
@@ -56,6 +57,14 @@ public class ProductController extends HttpServlet {
 		String keyWord = request.getParameter("keyWord");
 		String model = request.getParameter("model");
 		//int id = Integer.parseInt(request.getParameter("id"));
+		
+		HttpSession session = request.getSession();
+		Cart cart = (Cart) session.getAttribute("cart");
+		if(cart == null) {
+			cart = new Cart();
+			session.setAttribute("cart", cart);
+		}
+		
 		if (action != null) {
 			switch (action) {
 			case "allProducts":
@@ -77,17 +86,46 @@ public class ProductController extends HttpServlet {
 
 			case "viewSingle":
 				findSingleProduct(request,response, model);
-				url = base + "viewSingle.jsp?model=";
+				url = base + "viewSingle.jsp?model=" + model;
 				break;
 				
 			case "addToCart":
 				addToCart(request,response, model);
-				url = base + "addToCart.jsp?model=";
+				url = base + "addToCart.jsp?model=" + model;
 				break;
+				
+			case "checkout":
+				checkoutCart(request, response);
+				return;
 			}
 		}
 		RequestDispatcher requestDispatcher = request.getRequestDispatcher(url);
 		requestDispatcher.forward(request, response);
+	}
+
+	private void checkoutCart(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		try {
+			HttpSession session = request.getSession();
+			Cart cart = (Cart) session.getAttribute("cart");
+			
+			if(cart == null || cart.isEmpty()) {
+				cart = new Cart();
+				session.setAttribute("cart", cart);
+			}
+			
+			request.setAttribute("cart", cart);
+			cart.clear();
+			
+			request.setAttribute("message",  "Thank you for your order!");
+			
+		}
+		catch(Exception e) {
+			System.out.println(e);
+			request.setAttribute("message", "An error occured during checkout.Please try again.");
+		}
+			request.getRequestDispatcher("/jsp/checkout.jsp").forward(request, response);
+		
+		
 	}
 
 	private void findAllProducts(HttpServletRequest request,
@@ -157,6 +195,7 @@ public class ProductController extends HttpServlet {
 		try {
 			// calling DAO method to search book by catetory 
 			Product product = productDao.getSingleProduct(model);
+			Cart cart = (Cart) request.getSession().getAttribute("cart");
 			if (cart.contains(product.getId()) != null) {
 				System.out.println("hey");
 				product = cart.contains(product.getId());
