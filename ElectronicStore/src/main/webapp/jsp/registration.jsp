@@ -27,7 +27,8 @@
             <div id="account-section">
                 <h2>Account Information</h2>
                 <div id="login-section">
-                    <form id="loginForm" action="<%=request.getContextPath()%>/login" method="post">
+                    <form id="loginForm" action="<%=request.getContextPath()%>/userController" method="post">
+                    	<input type = "hidden" name="action" value="login">
                         <label for="loginEmail">Email</label>
                         <input type="email" id="loginEmail" name="loginEmail" required>
 
@@ -41,7 +42,8 @@
                 </div>
 
                 <div id="create-account-section" class="hidden">
-                    <form id="createAccountForm" action="<%=request.getContextPath()%>/register" method="post" onsubmit="return validatePasswords()">
+                    <form id="createAccountForm" action="<%=request.getContextPath()%>/userController" method="post" onsubmit="return validatePasswords()">
+                    	<input type="hidden" name="action" value="register">
                         <label for="newEmail">Email</label>
                         <input type="email" id="newEmail" name="newEmail" required>
 
