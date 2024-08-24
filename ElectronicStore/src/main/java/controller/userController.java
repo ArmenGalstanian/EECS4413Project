@@ -8,8 +8,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import dao.UserDAO;
+import dao.UserDAOImpl;
+import model.User;
+
 @WebServlet("/userController")
-public class UserControllerServlet extends HttpServlet {
+public class userController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String action = request.getParameter("action");
@@ -25,7 +29,7 @@ public class UserControllerServlet extends HttpServlet {
                 handleUpdateProfile(request, response);
                 break;
             default:
-                response.sendRedirect("error.jsp"); 
+                response.sendRedirect("registration.jsp"); 
         }
     }
 
@@ -41,7 +45,7 @@ public class UserControllerServlet extends HttpServlet {
                 handleLogout(request, response);
                 break;
             default:
-                response.sendRedirect("error.jsp"); 
+                response.sendRedirect("registration.jsp"); 
         }
     }
 
@@ -60,9 +64,12 @@ public class UserControllerServlet extends HttpServlet {
             return;
         }
 
-        
+        // Update user to the database 
+        UserDAO userDAO = new UserDAOImpl(getServletContext());
+        User user = new User(email, password, name, address, creditCard);
+        userDAO.saveUser(user);
 
-        response.sendRedirect("registration.jsp"); 
+        response.sendRedirect("registration.jsp");
     }
 
    
@@ -70,51 +77,67 @@ public class UserControllerServlet extends HttpServlet {
         String email = request.getParameter("loginEmail");
         String password = request.getParameter("loginPassword");
 
+        // Validate if user exist in the database 
+        UserDAO userDAO = new UserDAOImpl(getServletContext());
+        User user = userDAO.getUserByEmail(email);
+
         
 
-        boolean isValidUser = true; 
-
-        if (isValidUser) {
+        if ( user != null && user.getPassword().equals(password)) {
             HttpSession session = request.getSession();
-            session.setAttribute("user", email);
-            response.sendRedirect("profile.jsp"); 
+            session.setAttribute("user", user);
+            response.sendRedirect("profile.jsp");
         } else {
             request.setAttribute("error", "Invalid email or password");
-            request.getRequestDispatcher("login.jsp").forward(request, response);
+            request.getRequestDispatcher("registration.jsp").forward(request, response);
         }
     }
 
     
     private void handleUpdateProfile(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession();
-        String userEmail = (String) session.getAttribute("user");
+        User user = (User) session.getAttribute("user");
+
+        if (user == null) {
+            response.sendRedirect("registration.jsp");
+            return;
+        }
 
         String newName = request.getParameter("name");
         String newAddress = request.getParameter("address");
         String newCreditCard = request.getParameter("creditCard");
 
-        
-        session.setAttribute("userName", newName);
+        // Update user details in the database if new user
+        UserDAO userDAO = new UserDAOImpl(getServletContext());
+        user.setName(newName);
+        user.setAddress(newAddress);
+        user.setCreditCard(newCreditCard);
+        userDAO.updateUser(user);
 
-        response.sendRedirect("profile.jsp"); 
+        
+        session.setAttribute("user", user);
+
+        response.sendRedirect("profile.jsp");
     }
+
 
    
     private void handleProfile(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession();
-        String userEmail = (String) session.getAttribute("user");
+        User user = (User) session.getAttribute("user");
 
-       
-        String userName = "User Name"; 
-        String userAddress = "User Address"; 
-        String userCreditCard = "User Credit Card"; 
+        if (user == null) {
+            response.sendRedirect("registration.jsp");
+            return;
+        }
 
-        request.setAttribute("name", userName);
-        request.setAttribute("address", userAddress);
-        request.setAttribute("creditCard", userCreditCard);
+        request.setAttribute("name", user.getName());
+        request.setAttribute("address", user.getAddress());
+        request.setAttribute("creditCard", user.getCreditCard());
 
         request.getRequestDispatcher("profile.jsp").forward(request, response);
     }
+
 
    
     private void handleLogout(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
