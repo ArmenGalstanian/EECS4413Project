@@ -9,6 +9,9 @@ public class Cart {
 	private List<Product> products;
 	private float bill;
 	
+	private final float tax = 0.13f;
+	private final float shipping = 0.0f;
+	
 	public Cart() {
 		products = new ArrayList<Product>();
 		bill = 0;
@@ -16,8 +19,16 @@ public class Cart {
 	
 	public Cart(List<Product> products) {
 		this.products = products;
+		updateBill();
 	}
 	
+	private void updateBill() {
+		bill = 0;
+		for (Product product: products) {
+			bill += product.getPrice() * product.getQty();
+		}
+	}
+
 	public List<Product> getItems() {return this.products;}
 	
 	public float getBill() {return this.bill;}
@@ -28,8 +39,10 @@ public class Cart {
 	}
 	
 	public void add(Product product) {
-		if (contains(product) != null)
-			return;
+		Product itemInCart = contains (product);
+		
+		if (itemInCart != null)
+			update(product.getId(), product.getQty());
 		else {
 			products.add(product);
 			bill += product.getPrice()*product.getQty();
@@ -47,7 +60,7 @@ public class Cart {
 			Product product = (Product) iter.next();
 			if (product.getId() == id) {
 				iter.remove();
-				bill -= product.getPrice()*product.getQty();
+				updateBill();
 				return;
 			}
 		}
@@ -56,14 +69,16 @@ public class Cart {
 	
 	public void remove(Product product) {remove(product.getId());}
 	
-	public void update(int id, int qty) {
+	public void update(Long id, int qty) {
 		for (Product product: products)
 			if (product.getId() == id) {
 				bill -= product.getPrice()*product.getQty();
 				product.setQty(qty);
 				bill += product.getPrice()*product.getQty();
+				return;
 			}
 	}
+
 	
 	public Product contains(long id) {
 		for (Product i: products)
@@ -79,5 +94,16 @@ public class Cart {
 		return null;
 	}
 	
+	public float calculateTax() {
+		return bill * tax;
+	}
+	
+	public float calculateTotal() {
+		return bill + calculateTax() + shipping;
+	}
 	public String toString() {return "Size of Cart: " + products.size() + ", Total Bill: $" + bill;}
+
+	public boolean isEmpty() {
+		return products.isEmpty();
+	}
 }
