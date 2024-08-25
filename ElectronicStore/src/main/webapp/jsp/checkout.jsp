@@ -56,11 +56,7 @@
                     <label for="cvv">CVV</label>
                     <input type="text" id="cvv" name="cvv" required>
 
-                    <div class="payment-icons">
-                        <img src="visa.png" alt="Visa">
-                        <img src="mastercard.png" alt="MasterCard">
-                        <img src="paypal.png" alt="PayPal">
-                    </div>
+                    
                 </div>
 
                 <div class="section">
