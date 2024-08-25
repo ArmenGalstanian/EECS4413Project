@@ -6,12 +6,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Checkout</title>
-    <link rel="stylesheet" href="productStore.css">
+    <link rel="stylesheet" href="bookstore.css">
     <style>
-        .payment-icons img {
-            width: 50px;
-            margin: 5px;
-        }
+        
     </style>
 </head>
 <body>
@@ -40,6 +37,7 @@
 
                     <label for="country">Country</label>
                     <input type="text" id="country" name="country" required>
+                
                 </div>
 
                 <div class="section">
@@ -74,10 +72,12 @@
                             <li>${product.name} - ${product.qty} x ${product.price} = ${product.price * product.qty}</li>
                         </c:forEach>
                     </ul>
-                    <p><strong>Subtotal:</strong> ${cart.bill}</p>
-                    <p><strong>Tax:</strong> ${cart.calculateTax()}</p>
-                    <p><strong>Shipping: free</strong>
-                    <p><strong>Total:</strong> ${cart.calculateTotal()}</p>
+                    <p>Subtotal: ${cart.bill}</p>
+                    <p>Tax: ${cart.calculateTax()}</p>
+                    <p>Shipping: free </p>
+                    <p>Total: ${cart.calculateTotal()}</p>
+                    <p id="shippingMessage"></p>
+                    
                 </c:when>
                 <c:otherwise>
                     <p>Your cart is empty.</p>
@@ -89,10 +89,7 @@
             <div id="orderDetails">
             </div>
         </div>
-		<div class="section">
-			<h2>Shipping Information</h2>
-			<p id="shippingMessage"></p>
-		</div>
+		
         <div class="payment-error" style="display: none;" id="paymentError">
             <h2>Payment Denied</h2>
             <p>Your payment has been denied after three attempts. Please try with a different payment method.</p>
@@ -103,7 +100,7 @@
     <script>
         let orderCount = 0;
         let paymentAttempts = 0;
-
+// validating the email format
         function validateEmail(email) {
             const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             return re.test(email);
@@ -122,7 +119,7 @@
         function validateCVV(cvv) {
             return /^[0-9]{3}$/.test(cvv);
         }
-
+//validating all the information goes through then places the order
         function processOrder(event) {
             event.preventDefault(); 
 
@@ -172,7 +169,7 @@
             document.getElementById('paymentError').style.display = 'none';
             document.getElementById('checkoutForm').style.display = 'block';
         }
-        
+     //calculating estimated shipping date   
         function calculateShippingDate(){
         	const shippingMessage = document.getElementById('shippingMessage');
         	const today = new Date();
