@@ -1,0 +1,6 @@
+docker pull armen7123/test:3
+
+docker run -d -p 8080:8080(for local host) {{image name which you would copy paste from the dockerhub}}
+
+i.e. 
+docker run -d -p 8080:8080 abc123
